@@ -1,4 +1,4 @@
-# InMemoryJavaCompiler
+# InMemoryJavaCompiler [![Build Status](https://travis-ci.org/trung/InMemoryJavaCompiler.svg?branch=master)](https://travis-ci.org/trung/InMemoryJavaCompiler)
 Samples with utility classes to compile java source code in memory
 
 After taking huge effort to look for example on the internet and found nothing work. I decided to create a very simple version.
