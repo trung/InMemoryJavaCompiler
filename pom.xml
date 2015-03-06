@@ -22,10 +22,6 @@
         </license>
     </licenses>
 
-    <scm>
-        <developerConnection></developerConnection>
-    </scm>
-
     <issueManagement>
         <url>https://github.com/trung/InMemoryJavaCompiler/issues</url>
         <system>GitHub Issues</system>
