@@ -14,6 +14,7 @@
         <maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
+        <gpg.executable>gpg2</gpg.executable>
     </properties>
 
     <licenses>
@@ -46,6 +47,15 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <developers>
+        <developer>
+            <name>Trung Nguyen</name>
+            <email>trung.n.k@gmail.com</email>
+            <organization>Github</organization>
+            <organizationUrl>https://github.com/trung</organizationUrl>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
