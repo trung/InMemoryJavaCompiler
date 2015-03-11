@@ -3,7 +3,7 @@
 
     <groupId>org.mdkt.compiler</groupId>
     <artifactId>InMemoryJavaCompiler</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
     <url>https://github.com/trung/InMemoryJavaCompiler</url>
 
@@ -35,7 +35,7 @@
         <url>https://github.com/trung/InMemoryJavaCompiler</url>
         <connection>scm:git:git://github.com/trung/InMemoryJavaCompiler</connection>
         <developerConnection>scm:git:git@github.com:trung/InMemoryJavaCompiler.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>InMemoryJavaCompiler-1.2</tag>
   </scm>
 
     <distributionManagement>
