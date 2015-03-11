@@ -1,2 +1,4 @@
 .idea
 InMemoryJavaCompiler.iml
+target
+release.properties*
