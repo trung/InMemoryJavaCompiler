@@ -8,6 +8,7 @@
     <url>https://github.com/trung/InMemoryJavaCompiler</url>
 
     <name>InMemoryJavaCompiler</name>
+    <description>Small utility to compile java code in memory</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
