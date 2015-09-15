@@ -12,3 +12,15 @@ E.g.:
     sourceCode.append("}");
 
     Class<?> helloClass = InMemoryJavaCompiler.compile("org.mdkt.HelloClass", sourceCode.toString());
+
+Artifact is pushed to Sonatype OSS Releases Repository
+
+    https://oss.sonatype.org/content/repositories/releases/
+
+Maven dependency:
+
+    <dependency>
+        <groupId>org.mdkt.compiler</groupId>
+        <artifactId>InMemoryJavaCompiler</artifactId>
+        <version>1.2</version>
+    </dependency>
