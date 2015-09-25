@@ -2,6 +2,7 @@ package org.mdkt.compiler;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.tools.JavaCompiler;
@@ -39,14 +40,14 @@ public class InMemoryJavaCompiler {
 	public Map<String, Class<?>> compileAll() throws Exception {
 		Collection<SourceCode> compilationUnits = clazzCode.values();
 		CompiledCode[] code;
-		code = compilationUnits.stream().map(in -> {
-			try {
-				return new CompiledCode(in.getClassName());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}).toArray(CompiledCode[]::new);
-
+		
+		code = new CompiledCode[compilationUnits.size()];
+		Iterator<SourceCode> iter = compilationUnits.iterator();
+		for (int i=0; i<code.length; i++)
+		{
+			code[i] = new CompiledCode(iter.next().getClassName());
+		}
+		
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(
 				javac.getStandardFileManager(null, null, null), classLoader, code);
 		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager,
