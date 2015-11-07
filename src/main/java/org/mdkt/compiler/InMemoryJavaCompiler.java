@@ -1,11 +1,15 @@
 package org.mdkt.compiler;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
@@ -49,7 +53,7 @@ public class InMemoryJavaCompiler {
 		}
 		
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(
-				javac.getStandardFileManager(null, null, null), classLoader, code);
+				javac.getStandardFileManager(null, null, null), classLoader);
 		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager,
 				null, null, null, compilationUnits);
 		boolean result = task.call();

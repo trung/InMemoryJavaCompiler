@@ -42,4 +42,19 @@ public class InMemoryJavaCompilerTest {
         Object a = aClass.newInstance();
         Assert.assertEquals("B!", aClass.getMethod("b").invoke(a).toString());
     }
+    
+    @Test
+    public void compile_filesWithInnerClasses() throws Exception {
+    	StringBuffer sourceCode = new StringBuffer();
+
+        sourceCode.append("package org.mdkt;\n");
+        sourceCode.append("public class HelloClass {\n");
+        sourceCode.append("   private static class InnerHelloWorld { int inner; }\n");
+        sourceCode.append("   public String hello() { return \"hello\"; }");
+        sourceCode.append("}");
+
+        Class<?> helloClass = InMemoryJavaCompiler.compile("org.mdkt.HelloClass", sourceCode.toString());
+        Assert.assertNotNull(helloClass);
+        Assert.assertEquals(1, helloClass.getDeclaredMethods().length);
+    }
 }
