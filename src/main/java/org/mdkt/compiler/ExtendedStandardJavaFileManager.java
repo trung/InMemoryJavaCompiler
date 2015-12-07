@@ -27,9 +27,25 @@ public class ExtendedStandardJavaFileManager extends ForwardingJavaFileManager<J
         this.cl.setCode(compiledCode);
     }
 
+    /**
+     * Creates a new instance of ForwardingJavaFileManager.
+     *
+     * @param fileManager
+     * @param compiledCodes
+     * @param cl
+     */
+    protected ExtendedStandardJavaFileManager(JavaFileManager fileManager, CompiledCode[] compiledCodes, DynamicClassLoader cl) {
+        super(fileManager);
+        this.compiledCode = compiledCode;
+        this.cl = cl;
+        for (CompiledCode compiledCode : compiledCodes) {
+            this.cl.setCode(compiledCode);
+        }
+    }
+
     @Override
     public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
-        return compiledCode;
+        return cl.getCompiledCode(className);
     }
 
     @Override
