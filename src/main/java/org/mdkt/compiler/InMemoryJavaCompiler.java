@@ -26,6 +26,10 @@ public class InMemoryJavaCompiler {
     }
 
     public static Class<?>[] mutilCompile(String[] classNames, String[] sourceCodeInTexts) throws Exception {
+        if (javac == null) {
+            throw new Exception("ToolProvider.getSystemJavaCompiler()==null,java.home = "
+                    + System.getProperty("java.home") + " try to find tool.jar");
+        }
         if (classNames.length != sourceCodeInTexts.length) {
             throw new Exception("classNames length != sourceCodeInTexts length!");
         }
@@ -39,10 +43,6 @@ public class InMemoryJavaCompiler {
             compilationUnits.add(sourceCode);
         }
         DynamicClassLoader cl = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
-        if (javac == null) {
-            throw new Exception("ToolProvider.getSystemJavaCompiler()==null,java.home = "
-                    + System.getProperty("java.home") + " try to find tool.jar");
-        }
         ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null),
                 compiledCodes, cl);
         JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, null, null, null, compilationUnits);
