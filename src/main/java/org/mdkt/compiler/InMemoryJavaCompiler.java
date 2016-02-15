@@ -16,7 +16,8 @@ public class InMemoryJavaCompiler {
         Iterable<? extends JavaFileObject> compilationUnits = Collections.singletonList(sourceCode);
         DynamicClassLoader cl = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
         ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), compiledCode, cl);
-        JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, null,
+        JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector,
+                                                          Collections.singletonList("-Xlint:unchecked"),
                                                           null, compilationUnits);
         try {
             boolean result = task.call();
