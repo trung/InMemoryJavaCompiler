@@ -8,11 +8,9 @@ import java.util.*;
  */
 public class InMemoryJavaCompiler {
     static  JavaCompiler                        javac = ToolProvider.getSystemJavaCompiler();
-    private DiagnosticCollector<JavaFileObject> collector;
-    private boolean result;
 
-    public Class<?> compile(String className, String sourceCodeInText) throws Exception {
-        collector = new DiagnosticCollector<>();
+    public static Class<?> compile(String className, String sourceCodeInText) throws Exception {
+        DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
         SourceCode sourceCode = new SourceCode(className, sourceCodeInText);
         CompiledCode compiledCode = new CompiledCode(className);
         Iterable<? extends JavaFileObject> compilationUnits = Collections.singletonList(sourceCode);
@@ -20,15 +18,16 @@ public class InMemoryJavaCompiler {
         ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), compiledCode, cl);
         JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, null,
                                                           null, compilationUnits);
-        result = task.call();
+        try {
+            boolean result = task.call();
+
+            if(!result) {
+                throw new InMemoryCompilerException(collector.getDiagnostics());
+            }
+        } catch(ClassFormatError e) {
+            throw new InMemoryCompilerException(collector.getDiagnostics());
+        }
+
         return cl.loadClass(className);
-    }
-
-    public boolean getResult() {
-        return result;
-    }
-
-    public List<Diagnostic<? extends JavaFileObject>> getDiagnostics() {
-        return collector.getDiagnostics();
     }
 }
