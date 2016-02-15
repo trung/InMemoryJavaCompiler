@@ -7,11 +7,7 @@ import java.util.*;
 /**************************************************
  * @author Ryan Rowe (1531352)
  *         2/15/16
- *         CSE 143 B/BP
- *         TA: Chloe Lathe
  *         InMemoryJavaCompiler
- *         <p/>
- *         Description
  **************************************************/
 
 public class InMemoryCompilerException extends Exception {
