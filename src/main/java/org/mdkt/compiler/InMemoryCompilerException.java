@@ -30,7 +30,7 @@ public class InMemoryCompilerException extends Exception {
         for(Diagnostic diag : diags) {
             Map<String, Object> diagnostic = new HashMap<>();
 
-            diagnostic.put("type", diag.getCode());
+            diagnostic.put("kind", diag.getKind());
             diagnostic.put("line", diag.getLineNumber() - line + 1);
             diagnostic.put("message", diag.getMessage(Locale.US));
 
