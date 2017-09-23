@@ -1,6 +1,7 @@
 package org.mdkt.compiler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,7 +15,13 @@ public class DynamicClassLoader extends ClassLoader {
         super(parent);
     }
 
-    public void setCode(CompiledCode cc) {
+    public void addCodes(List<CompiledCode> compiledCodes) {
+        for (CompiledCode cc : compiledCodes) {
+            customCompiledCode.put(cc.getName(), cc);
+        }
+    }
+
+    public void addCode(CompiledCode cc) {
         customCompiledCode.put(cc.getName(), cc);
     }
 
