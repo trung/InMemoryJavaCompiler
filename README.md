@@ -17,6 +17,12 @@ E.g.:
 
     Class<?> helloClass = InMemoryJavaCompiler.compile("org.mdkt.HelloClass", sourceCode.toString());
 
+    String classNames[] = new String[]{"com.compile.test.A", "com.compile.test.B"};
+    String sources[] = new String[]{"package com.compile.test;import com.compile.test.B;public class A{ B b;int i;}",
+            "package com.compile.test; public class B{String a;}"};
+
+    Class<?>[] classes = InMemoryJavaCompiler.mutilCompile(classNames, sources);
+
 Artifact is pushed to Sonatype OSS Releases Repository
 
     https://oss.sonatype.org/content/repositories/releases/
