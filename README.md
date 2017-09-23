@@ -5,6 +5,8 @@ Samples with utility classes to compile java source code in memory
 
 After taking huge effort to look for example on the internet and found nothing work. I decided to create a very simple version.
 
+**Note**: Please make sure you use JDK in your runtime
+
 E.g.:
 
     StringBuffer sourceCode = new StringBuffer();
