@@ -14,7 +14,7 @@ public class DynamicClassLoader extends ClassLoader {
         super(parent);
     }
 
-    public void setCode(CompiledCode cc) {
+    public void addCode(CompiledCode cc) {
         customCompiledCode.put(cc.getName(), cc);
     }
 
