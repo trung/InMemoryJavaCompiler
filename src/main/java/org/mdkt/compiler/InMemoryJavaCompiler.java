@@ -1,81 +1,92 @@
 package org.mdkt.compiler;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
- * Created by trung on 5/3/15.
- * Edited by turpid-monkey on 9/25/15, added support for multiple, dependent compile units.
+ * Complile Java sources in-memory
  */
 public class InMemoryJavaCompiler {
-	JavaCompiler javac;
-	DynamicClassLoader classLoader;
+	private JavaCompiler javac;
+	private DynamicClassLoader classLoader;
 
-	Map<String, SourceCode> clazzCode = new HashMap<String, SourceCode>();
+	private Map<String, SourceCode> sourceCodes = new HashMap<String, SourceCode>();
 
-	public InMemoryJavaCompiler(ClassLoader parent) {
-		this(ToolProvider.getSystemJavaCompiler(), parent);
+	public static InMemoryJavaCompiler newInstance() {
+		return new InMemoryJavaCompiler();
 	}
 
-	public InMemoryJavaCompiler(JavaCompiler javac, ClassLoader parent) {
-		this.javac = javac;
+	private InMemoryJavaCompiler() {
+		this.javac = ToolProvider.getSystemJavaCompiler();
+		this.classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
+	}
+
+	public InMemoryJavaCompiler useParentClassLoader(ClassLoader parent) {
 		this.classLoader = new DynamicClassLoader(parent);
+		return this;
 	}
 
-	public InMemoryJavaCompiler() {
-		this(ToolProvider.getSystemJavaCompiler(), ClassLoader
-				.getSystemClassLoader());
-	}
-
-	public void addSource(String className, String sourceCodeInText)
-			throws Exception {
-		clazzCode.put(className, new SourceCode(className, sourceCodeInText));
-	}
-
+	/**
+	 * Compile all sources
+	 *
+	 * @return
+	 * @throws Exception
+	 */
 	public Map<String, Class<?>> compileAll() throws Exception {
-		Collection<SourceCode> compilationUnits = clazzCode.values();
+		if (sourceCodes.size() == 0) {
+			throw new Exception("No source code to compile");
+		}
+		Collection<SourceCode> compilationUnits = sourceCodes.values();
 		CompiledCode[] code;
-		
+
 		code = new CompiledCode[compilationUnits.size()];
 		Iterator<SourceCode> iter = compilationUnits.iterator();
-		for (int i=0; i<code.length; i++)
-		{
+		for (int i = 0; i < code.length; i++) {
 			code[i] = new CompiledCode(iter.next().getClassName());
 		}
-		
-		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(
-				javac.getStandardFileManager(null, null, null), classLoader);
-		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager,
-				null, null, null, compilationUnits);
+
+		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader);
+		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, null, null, null, compilationUnits);
 		boolean result = task.call();
-		if (!result)
+		if (!result) {
 			throw new RuntimeException("Unknown error during compilation.");
+		}
+
 		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
-		for (String className : clazzCode.keySet()) {
+		for (String className : sourceCodes.keySet()) {
 			classes.put(className, classLoader.loadClass(className));
 		}
 		return classes;
 	}
 
-	public static Class<?> compile(String className, String sourceCodeInText)
-			throws Exception {
-		InMemoryJavaCompiler comp = new InMemoryJavaCompiler();
-		comp.addSource(className, sourceCodeInText);
-		Map<String, Class<?>> clzzes = comp.compileAll();
-		Class<?> result = clzzes.get(className);
-		return result;
+	/**
+	 * Compile single source
+	 *
+	 * @param className
+	 * @param sourceCode
+	 * @return
+	 * @throws Exception
+	 */
+	public Class<?> compile(String className, String sourceCode) throws Exception {
+		return addSource(className, sourceCode).compileAll().get(className);
 	}
-	
-	public DynamicClassLoader getClassLoader() {
-		return classLoader;
+
+	/**
+	 * Add source code to the compiler
+	 *
+	 * @param className
+	 * @param sourceCode
+	 * @return
+	 * @throws Exception
+	 * @see {@link #compileAll()}
+	 */
+	public InMemoryJavaCompiler addSource(String className, String sourceCode) throws Exception {
+		sourceCodes.put(className, new SourceCode(className, sourceCode));
+		return this;
 	}
 }
