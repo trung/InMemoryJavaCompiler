@@ -15,20 +15,7 @@ E.g.:
     sourceCode.append("   public String hello() { return \"hello\"; }");
     sourceCode.append("}");
 
-    Class<?> helloClass = InMemoryJavaCompiler.compile("org.mdkt.HelloClass", sourceCode.toString());
-
-Alternatively, if you want to load several (dependent) classes:
-
-    String cls1 = "public class A{ public B b() { return new B(); }}";
-    String cls2 = "public class B{ public String toString() { return \"B!\"; }}";
-        
-    InMemoryJavaCompiler compiler = new InMemoryJavaCompiler();
-    compiler.addSource("A", cls1);
-    compiler.addSource("B", cls2);
-    Map<String,Class<?>> compiled = compiler.compileAll();
-    
-    Class<?> aClass = compiled.get("A");
-    
+    Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
 
 Artifact is pushed to Sonatype OSS Releases Repository
 
