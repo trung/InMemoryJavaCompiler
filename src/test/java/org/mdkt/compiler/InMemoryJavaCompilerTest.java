@@ -1,5 +1,6 @@
 package org.mdkt.compiler;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -66,5 +67,28 @@ public class InMemoryJavaCompilerTest {
 		sourceCode.append("   public String hello() { return \"hello\"; }");
 		sourceCode.append("}");
 		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+	}
+
+	@Test public void compile_FailOnWarnings() throws Exception{
+		thrown.expect(CompilationException.class);
+		StringBuffer sourceCode = new StringBuffer();
+
+		sourceCode.append("package org.mdkt;\n");
+		sourceCode.append("public class HelloClass {\n");
+		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
+		sourceCode.append("}");
+		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+	}
+
+	@Test public void compile_CompileAndIgnoreWarnings() throws Exception{
+		StringBuffer sourceCode = new StringBuffer();
+
+		sourceCode.append("package org.mdkt;\n");
+		sourceCode.append("public class HelloClass {\n");
+		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
+		sourceCode.append("}");
+		Class<?> helloClass = InMemoryJavaCompiler.newInstance().useIgnoreWarnings().compile("org.mdkt.HelloClass", sourceCode.toString());
+		List<?> res = (List) helloClass.getMethod("hello").invoke(helloClass.newInstance());
+		Assert.assertEquals(0, res.size());
 	}
 }
