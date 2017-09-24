@@ -1,21 +1,17 @@
 package org.mdkt.compiler;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
+import javax.tools.*;
 
 /**
- * Complile Java sources in-memory
+ * Compile Java sources in-memory
  */
 public class InMemoryJavaCompiler {
 	private JavaCompiler javac;
 	private DynamicClassLoader classLoader;
+	private Iterable<String> options;
+	boolean ignoreWarnings = false;
 
 	private Map<String, SourceCode> sourceCodes = new HashMap<String, SourceCode>();
 
@@ -34,9 +30,29 @@ public class InMemoryJavaCompiler {
 	}
 
 	/**
+	 * Options used by the compiler, e.g. '-Xlint:unchecked'.
+	 * @param options
+	 * @return
+	 */
+	public InMemoryJavaCompiler useOptions(String... options)
+	{
+		this.options = Arrays.asList(options);
+		return this;
+	}
+
+	/**
+	 * Ignore non-critical compiler output, like unchecked/unsafe operation warnings.
+	 * @return
+	 */
+	public InMemoryJavaCompiler useIgnoreWarnings() {
+		ignoreWarnings = true;
+		return this;
+	}
+
+	/**
 	 * Compile all sources
 	 *
-	 * @return
+	 * @return Map containing instances of all compiled classes
 	 * @throws Exception
 	 */
 	public Map<String, Class<?>> compileAll() throws Exception {
@@ -53,10 +69,18 @@ public class InMemoryJavaCompiler {
 		}
 		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader);
-		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, null, null, compilationUnits);
+		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, options, null, compilationUnits);
 		boolean result = task.call();
 		if (!result || collector.getDiagnostics().size() > 0) {
-			throw new CompilationException(collector.getDiagnostics());
+				for (Diagnostic<? extends JavaFileObject> d : collector.getDiagnostics()) {
+					if (ignoreWarnings &&
+							(d.getKind() == Diagnostic.Kind.NOTE || d.getKind() == Diagnostic.Kind.MANDATORY_WARNING || d.getKind() == Diagnostic.Kind.WARNING))
+						continue;
+					else {
+						throw new CompilationException(collector.getDiagnostics());
+					}
+				}
+
 		}
 
 		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
