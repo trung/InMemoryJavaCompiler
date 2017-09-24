@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
@@ -49,12 +51,12 @@ public class InMemoryJavaCompiler {
 		for (int i = 0; i < code.length; i++) {
 			code[i] = new CompiledCode(iter.next().getClassName());
 		}
-
+		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader);
-		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, null, null, null, compilationUnits);
+		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, null, null, compilationUnits);
 		boolean result = task.call();
-		if (!result) {
-			throw new RuntimeException("Unknown error during compilation.");
+		if (!result || collector.getDiagnostics().size() > 0) {
+			throw new CompilationException(collector.getDiagnostics());
 		}
 
 		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
