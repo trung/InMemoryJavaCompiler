@@ -30,6 +30,14 @@ public class InMemoryJavaCompiler {
 	}
 
 	/**
+	 * @return the class loader used internally by the compiler
+	 */
+	public ClassLoader getClassloader()
+	{
+		return classLoader;
+	}
+
+	/**
 	 * Options used by the compiler, e.g. '-Xlint:unchecked'.
 	 * @param options
 	 * @return
