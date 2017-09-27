@@ -18,8 +18,12 @@
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
         <gpg.executable>gpg2</gpg.executable>
+        
+        <!-- dependencies -->
+        <slf4j.version>1.7.5</slf4j.version>
+        <junit.version>4.12</junit.version>
     </properties>
-
+    
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -38,7 +42,7 @@
         <connection>scm:git:git://github.com/trung/InMemoryJavaCompiler</connection>
         <developerConnection>scm:git:git@github.com:trung/InMemoryJavaCompiler.git</developerConnection>
       <tag>HEAD</tag>
-  </scm>
+  	</scm>
 
     <distributionManagement>
         <snapshotRepository>
@@ -61,10 +65,21 @@
     </developers>
 
     <dependencies>
+     	<dependency>
+    		<groupId>org.slf4j</groupId>
+    		<artifactId>slf4j-api</artifactId>
+    		<version>${slf4j.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.slf4j</groupId>
+    		<artifactId>slf4j-jdk14</artifactId>
+    		<version>${slf4j.version}</version>
+    		<scope>test</scope>
+    	</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
