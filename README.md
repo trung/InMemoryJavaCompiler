@@ -9,13 +9,15 @@ After taking huge effort to look for example on the internet and found nothing w
 
 E.g.:
 
-    StringBuffer sourceCode = new StringBuffer();
+    StringBuilder sourceCode = new StringBuilder();
     sourceCode.append("package org.mdkt;\n");
     sourceCode.append("public class HelloClass {\n");
     sourceCode.append("   public String hello() { return \"hello\"; }");
     sourceCode.append("}");
 
     Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+
+If you are looking for more examples, please look at unit tests in the `src/test/java` folder
 
 Artifact is pushed to Sonatype OSS Releases Repository
 
