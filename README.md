@@ -1,6 +1,6 @@
 **Update 09/22/2017**: I've been silent for long time (I'm into Golang lately hence putting Java aside) despite the fact that there are lots of interests to make this mini tool better. I'll kick off my effort to improve this tool from now on by reviewing outstanding issues and PRs
 
-# InMemoryJavaCompiler [![Build Status](https://travis-ci.org/trung/InMemoryJavaCompiler.svg?branch=master)](https://travis-ci.org/trung/InMemoryJavaCompiler)
+# InMemoryJavaCompiler [![Build Status](https://travis-ci.org/trung/InMemoryJavaCompiler.svg?branch=master)](https://travis-ci.org/trung/InMemoryJavaCompiler) [![Coverage Status](https://coveralls.io/repos/github/trung/InMemoryJavaCompiler/badge.svg?branch=master)](https://coveralls.io/github/trung/InMemoryJavaCompiler?branch=master)
 Samples with utility classes to compile java source code in memory
 
 After taking huge effort to look for example on the internet and found nothing work. I decided to create a very simple version.
