@@ -26,5 +26,5 @@ Maven dependency:
     <dependency>
         <groupId>org.mdkt.compiler</groupId>
         <artifactId>InMemoryJavaCompiler</artifactId>
-        <version>1.2</version>
+        <version>1.3.0</version>
     </dependency>
