@@ -109,7 +109,7 @@ public class InMemoryJavaCompiler {
 
 		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 		for (String className : sourceCodes.keySet()) {
-			classes.put(className, classLoader.loadClass(className));
+			classes.put(className, classLoader.findClass(className));
 		}
 		return classes;
 	}
