@@ -1,5 +1,6 @@
 package org.mdkt.compiler;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,29 @@ public class InMemoryJavaCompilerTest {
 		Assert.assertNotNull(helloClass);
 		Assert.assertEquals(1, helloClass.getDeclaredMethods().length);
 	}
+
+	@Test
+	public void compile_WhenTypicalUpdateClass() throws Exception {
+		StringBuffer sourceCode = new StringBuffer();
+
+		sourceCode.append("package org.mdkt.compiler;\n");
+		sourceCode.append("public class HelloClass {\n");
+		sourceCode.append("   public String hello() { return \"hello1\"; }");
+		sourceCode.append("}");
+
+		Class<?> oldClass = HelloClass.class;
+		Class<?> newClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.compiler.HelloClass", sourceCode.toString());
+
+		Assert.assertNotEquals(oldClass.hashCode() , newClass.hashCode());
+		Assert.assertNotEquals(oldClass.getDeclaredMethod("hello").invoke(oldClass.newInstance()) ,
+				newClass.getDeclaredMethod("hello").invoke(newClass.newInstance()));
+
+
+
+
+
+	}
+
 
 	@Test
 	public void compileAll_WhenTypical() throws Exception {
@@ -114,4 +138,6 @@ public class InMemoryJavaCompilerTest {
 			throw e;
 		}
 	}
+
+
 }
