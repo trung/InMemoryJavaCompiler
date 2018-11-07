@@ -1,8 +1,7 @@
 package org.mdkt.compiler;
 
-import java.util.*;
-
 import javax.tools.*;
+import java.util.*;
 
 /**
  * Compile Java sources in-memory
@@ -65,38 +64,62 @@ public class InMemoryJavaCompiler {
 	 * @throws Exception
 	 */
 	public Map<String, Class<?>> compileAll() throws Exception {
+		Map<String, byte[]> compiled = compileAllToBytes();
+		return loadCompiledBytes(compiled);
+	}
+
+	public Class<?> loadCompiledBytes(String className, byte[] compiledClasses) throws ClassNotFoundException {
+		Map<String, byte[]> map = new HashMap<>();
+		map.put(className, compiledClasses);
+		return loadCompiledBytes(map).get(className);
+	}
+
+	public Map<String, Class<?>> loadCompiledBytes(Map<String, byte[]> compiledClasses) throws ClassNotFoundException {
+		ClassLoader classLoader = new ClassLoader() {
+			@Override
+			protected Class<?> findClass(String name) {
+				byte[] b = compiledClasses.get(name);
+				return defineClass(name, b, 0, b.length);
+			}
+		};
+		Map<String, Class<?>> classes = new HashMap<>();
+		for (String className : compiledClasses.keySet()) {
+			classes.put(className, classLoader.loadClass(className));
+		}
+		return classes;
+	}
+
+	public Map<String, byte[]> compileAllToBytes() throws Exception {
 		if (sourceCodes.size() == 0) {
 			throw new CompilationException("No source code to compile");
 		}
 		Collection<SourceCode> compilationUnits = sourceCodes.values();
-		CompiledCode[] code;
-
-		code = new CompiledCode[compilationUnits.size()];
+		CompiledCode[] code = new CompiledCode[compilationUnits.size()];
 		Iterator<SourceCode> iter = compilationUnits.iterator();
 		for (int i = 0; i < code.length; i++) {
 			code[i] = new CompiledCode(iter.next().getClassName());
 		}
 		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
-		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader);
+		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null), classLoader, code);
 		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, collector, options, null, compilationUnits);
 		boolean result = task.call();
 		if (!result || collector.getDiagnostics().size() > 0) {
-			StringBuffer exceptionMsg = new StringBuffer();
+			StringBuilder exceptionMsg = new StringBuilder();
 			exceptionMsg.append("Unable to compile the source");
 			boolean hasWarnings = false;
 			boolean hasErrors = false;
 			for (Diagnostic<? extends JavaFileObject> d : collector.getDiagnostics()) {
 				switch (d.getKind()) {
-				case NOTE:
-				case MANDATORY_WARNING:
-				case WARNING:
-					hasWarnings = true;
-					break;
-				case OTHER:
-				case ERROR:
-				default:
-					hasErrors = true;
-					break;
+					case NOTE:
+					case MANDATORY_WARNING:
+					case WARNING:
+						hasWarnings = true;
+						break;
+					case OTHER:
+					case ERROR:
+					default:
+						hasErrors = true;
+						break;
 				}
 				exceptionMsg.append("\n").append("[kind=").append(d.getKind());
 				exceptionMsg.append(", ").append("line=").append(d.getLineNumber());
@@ -107,9 +130,9 @@ public class InMemoryJavaCompiler {
 			}
 		}
 
-		Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
-		for (String className : sourceCodes.keySet()) {
-			classes.put(className, classLoader.loadClass(className));
+		Map<String, byte[]> classes = new HashMap<>();
+		for (CompiledCode aCode : code) {
+			classes.put(aCode.getClassName(), aCode.getByteCode());
 		}
 		return classes;
 	}
@@ -139,4 +162,6 @@ public class InMemoryJavaCompiler {
 		sourceCodes.put(className, new SourceCode(className, sourceCode));
 		return this;
 	}
+
+
 }

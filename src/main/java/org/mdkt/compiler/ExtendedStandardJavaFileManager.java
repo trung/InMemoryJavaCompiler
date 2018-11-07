@@ -1,15 +1,14 @@
 package org.mdkt.compiler;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by trung on 5/3/15. Edited by turpid-monkey on 9/25/15, completed
@@ -18,20 +17,20 @@ import javax.tools.JavaFileObject;
 public class ExtendedStandardJavaFileManager extends
 		ForwardingJavaFileManager<JavaFileManager> {
 
-	private List<CompiledCode> compiledCode = new ArrayList<CompiledCode>();
+	private Map<String, CompiledCode> compiledCode;
 	private DynamicClassLoader cl;
 
 	/**
 	 * Creates a new instance of ForwardingJavaFileManager.
 	 *
-	 * @param fileManager
-	 *            delegate to this file manager
+	 * @param fileManager delegate to this file manager
 	 * @param cl
 	 */
 	protected ExtendedStandardJavaFileManager(JavaFileManager fileManager,
-			DynamicClassLoader cl) {
+	                                          DynamicClassLoader cl, CompiledCode[] compiledCode) {
 		super(fileManager);
 		this.cl = cl;
+		this.compiledCode = Arrays.stream(compiledCode).collect(Collectors.toMap(CompiledCode::getClassName, c -> c));
 	}
 
 	@Override
@@ -40,8 +39,11 @@ public class ExtendedStandardJavaFileManager extends
 			JavaFileObject.Kind kind, FileObject sibling) throws IOException {
 
 		try {
-			CompiledCode innerClass = new CompiledCode(className);
-			compiledCode.add(innerClass);
+			CompiledCode innerClass = compiledCode.get(className);
+			if (innerClass == null) {
+				innerClass = new CompiledCode(className);
+				compiledCode.put(className, innerClass);
+			}
 			cl.addCode(innerClass);
 			return innerClass;
 		} catch (Exception e) {

@@ -1,14 +1,14 @@
 package org.mdkt.compiler;
 
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryJavaCompilerTest {
 	private static final Logger logger = LoggerFactory.getLogger(InMemoryJavaCompilerTest.class);
@@ -113,5 +113,26 @@ public class InMemoryJavaCompilerTest {
 			logger.info("Exception caught: {}", e);
 			throw e;
 		}
+	}
+
+	@Test
+	public void compile_save_run() throws Exception {
+		StringBuffer sourceCode = new StringBuffer();
+
+		sourceCode.append("package org.mdkt;\n");
+		sourceCode.append("public class HelloClass {\n");
+		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
+		sourceCode.append("}");
+
+
+		InMemoryJavaCompiler compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings().addSource("org.mdkt.HelloClass", sourceCode.toString());
+		Map<String, byte[]> compiled = compiler.compileAllToBytes();
+		byte[] helloClassCode = compiled.get("org.mdkt.HelloClass");
+		//compiled code is in helloClassCode
+
+
+		Class<?> helloClass = InMemoryJavaCompiler.newInstance().loadCompiledBytes("org.mdkt.HelloClass", helloClassCode);
+		List<?> res = (List<?>) helloClass.getMethod("hello").invoke(helloClass.newInstance());
+		Assert.assertEquals(0, res.size());
 	}
 }
