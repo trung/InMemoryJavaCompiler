@@ -139,4 +139,9 @@ public class InMemoryJavaCompiler {
 		sourceCodes.put(className, new SourceCode(className, sourceCode));
 		return this;
 	}
+	public InMemoryJavaCompiler addSource(Map<String, SourceCode> sourceCodes ) throws Exception {
+		sourceCodes.putAll(sourceCodes);
+		return this;
+	}
+
 }
