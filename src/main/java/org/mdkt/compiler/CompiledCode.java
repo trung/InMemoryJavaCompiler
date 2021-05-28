@@ -14,7 +14,7 @@ public class CompiledCode extends SimpleJavaFileObject {
     private String className;
 
     public CompiledCode(String className) throws Exception {
-        super(new URI(className), Kind.CLASS);
+        super(new URI(className), JavaFileObject.Kind.CLASS);
         this.className = className;
     }
     
