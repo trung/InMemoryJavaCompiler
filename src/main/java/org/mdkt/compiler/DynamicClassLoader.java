@@ -3,6 +3,8 @@ package org.mdkt.compiler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mdkt.compiler.CompiledCode;
+
 public class DynamicClassLoader extends ClassLoader {
 
 	private Map<String, CompiledCode> customCompiledCode = new HashMap<>();
