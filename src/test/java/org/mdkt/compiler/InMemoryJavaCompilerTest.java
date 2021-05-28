@@ -2,6 +2,9 @@ package org.mdkt.compiler;
 
 import java.util.List;
 import java.util.Map;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -16,26 +19,30 @@ public class InMemoryJavaCompilerTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	public String getResourceAsString(String path) throws Exception {
+		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		InputStream srcResStream = classloader.getResourceAsStream(path);
+
+		// Thanks to https://www.baeldung.com/convert-input-stream-to-string
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		byte[] chunk = new byte[4096];
+		int bytesRead = 0;
+		while ((bytesRead = srcResStream.read(chunk, 0, chunk.length)) != -1) {
+			buf.write(chunk, 0, bytesRead);
+		}
+		return new String(buf.toByteArray(), StandardCharsets.UTF_8);
+	}
+
 	@Test
 	public void compile_WhenTypical() throws Exception {
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass {\n");
-		sourceCode.append("   public String hello() { return \"hello\"; }");
-		sourceCode.append("}");
-
-		Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+		Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", getResourceAsString("compile_WhenTypical/HelloClass.java"));
 		Assert.assertNotNull(helloClass);
 		Assert.assertEquals(1, helloClass.getDeclaredMethods().length);
 	}
 
 	@Test
 	public void compileAll_WhenTypical() throws Exception {
-		String cls1 = "public class A{ public B b() { return new B(); }}";
-		String cls2 = "public class B{ public String toString() { return \"B!\"; }}";
-
-		Map<String, Class<?>> compiled = InMemoryJavaCompiler.newInstance().addSource("A", cls1).addSource("B", cls2).compileAll();
+		Map<String, Class<?>> compiled = InMemoryJavaCompiler.newInstance().addSource("A", getResourceAsString("compileAll_WhenTypical/A.java")).addSource("B", getResourceAsString("compileAll_WhenTypical/B.java")).compileAll();
 
 		Assert.assertNotNull(compiled.get("A"));
 		Assert.assertNotNull(compiled.get("B"));
@@ -47,15 +54,7 @@ public class InMemoryJavaCompilerTest {
 
 	@Test
 	public void compile_WhenSourceContainsInnerClasses() throws Exception {
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass {\n");
-		sourceCode.append("   private static class InnerHelloWorld { int inner; }\n");
-		sourceCode.append("   public String hello() { return \"hello\"; }");
-		sourceCode.append("}");
-
-		Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+		Class<?> helloClass = InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", getResourceAsString("compile_WhenSourceContainsInnerClasses/HelloClass.java"));
 		Assert.assertNotNull(helloClass);
 		Assert.assertEquals(1, helloClass.getDeclaredMethods().length);
 	}
@@ -64,36 +63,18 @@ public class InMemoryJavaCompilerTest {
 	public void compile_whenError() throws Exception {
 		thrown.expect(CompilationException.class);
 		thrown.expectMessage("Unable to compile the source");
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public classHelloClass {\n");
-		sourceCode.append("   public String hello() { return \"hello\"; }");
-		sourceCode.append("}");
-		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", getResourceAsString("compile_whenError/HelloClass.java"));
 	}
 
 	@Test
 	public void compile_WhenFailOnWarnings() throws Exception {
 		thrown.expect(CompilationException.class);
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass {\n");
-		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
-		sourceCode.append("}");
-		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+		InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", getResourceAsString("compile_WhenFailOnWarnings/HelloClass.java"));
 	}
 
 	@Test
 	public void compile_WhenIgnoreWarnings() throws Exception {
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass {\n");
-		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
-		sourceCode.append("}");
-		Class<?> helloClass = InMemoryJavaCompiler.newInstance().ignoreWarnings().compile("org.mdkt.HelloClass", sourceCode.toString());
+		Class<?> helloClass = InMemoryJavaCompiler.newInstance().ignoreWarnings().compile("org.mdkt.HelloClass", getResourceAsString("compile_WhenIgnoreWarnings/HelloClass.java"));
 		List<?> res = (List<?>) helloClass.getMethod("hello").invoke(helloClass.newInstance());
 		Assert.assertEquals(0, res.size());
 	}
@@ -101,14 +82,8 @@ public class InMemoryJavaCompilerTest {
 	@Test
 	public void compile_WhenWarningsAndErrors() throws Exception {
 		thrown.expect(CompilationException.class);
-		StringBuffer sourceCode = new StringBuffer();
-
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass extends xxx {\n");
-		sourceCode.append("   public java.util.List<String> hello() { return new java.util.ArrayList(); }");
-		sourceCode.append("}");
 		try {
-			InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", sourceCode.toString());
+			InMemoryJavaCompiler.newInstance().compile("org.mdkt.HelloClass", getResourceAsString("compile_WhenWarningsAndErrors/HelloClass.java"));
 		} catch (Exception e) {
 			logger.info("Exception caught: {}", e);
 			throw e;
