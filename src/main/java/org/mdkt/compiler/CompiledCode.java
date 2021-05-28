@@ -1,10 +1,12 @@
 package org.mdkt.compiler;
 
-import javax.tools.SimpleJavaFileObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
 
 /**
  * Created by trung on 5/3/15.

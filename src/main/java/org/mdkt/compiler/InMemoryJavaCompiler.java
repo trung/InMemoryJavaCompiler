@@ -1,8 +1,23 @@
 package org.mdkt.compiler;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
-import javax.tools.*;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.ToolProvider;
+
+import org.mdkt.compiler.CompilationException;
+import org.mdkt.compiler.CompiledCode;
+import org.mdkt.compiler.DynamicClassLoader;
+import org.mdkt.compiler.ExtendedStandardJavaFileManager;
+import org.mdkt.compiler.SourceCode;
 
 /**
  * Compile Java sources in-memory
