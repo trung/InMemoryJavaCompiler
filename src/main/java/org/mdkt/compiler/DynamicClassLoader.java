@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DynamicClassLoader extends ClassLoader {
-
 	private Map<String, CompiledCode> customCompiledCode = new HashMap<>();
 
 	public DynamicClassLoader(ClassLoader parent) {

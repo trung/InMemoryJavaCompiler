@@ -69,11 +69,9 @@ public class InMemoryJavaCompiler {
 			throw new CompilationException("No source code to compile");
 		}
 		Collection<SourceCode> compilationUnits = sourceCodes.values();
-		CompiledCode[] code;
-
-		code = new CompiledCode[compilationUnits.size()];
+		CompiledCode[] code = new CompiledCode[compilationUnits.size()];
 		Iterator<SourceCode> iter = compilationUnits.iterator();
-		for (int i = 0; i < code.length; i++) {
+		for (int i = 0; i < code.length; ++i) {
 			code[i] = new CompiledCode(iter.next().getClassName());
 		}
 		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
